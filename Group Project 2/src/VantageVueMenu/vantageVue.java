@@ -179,7 +179,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-			
+			        panel.add(labelWelcome);
 				panel.repaint();
 			}
 		});
