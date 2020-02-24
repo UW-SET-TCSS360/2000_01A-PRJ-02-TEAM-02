@@ -28,7 +28,7 @@ public class vantageVue {
     /** the main JFrame*/
 	private JFrame jFrame;
 	/** WeatherStation object where data will be generated from*/
-	private WeatherStation w = new WeatherStation();
+//	private WeatherStation w = new WeatherStation();
     /** Radio button for the home tab*/
 	private JRadioButton homeButton;
     /** Radio button for graphs tab*/
