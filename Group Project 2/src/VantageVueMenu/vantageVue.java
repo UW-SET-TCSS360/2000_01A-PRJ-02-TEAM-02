@@ -1,11 +1,12 @@
 /**
  * Class to create the GUI for the displaying of information from the Vantage Vue Weather Station.
- * @author Elham Jmaileh
- * @author Cynthia Pang 
+ * 
+ * @author Elham Jmaileh & Cynthia Pang
+ * @version 2.0 02-18-2020
  *
  */
 
-package VantageVue;
+package VantageVueMenu;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
@@ -27,7 +28,7 @@ public class vantageVue {
     /** the main JFrame*/
 	private JFrame jFrame;
 	/** WeatherStation object where data will be generated from*/
-	private WeatherStation w = new WeatherStation();
+//	private WeatherStation w = new WeatherStation();
     /** Radio button for the home tab*/
 	private JRadioButton homeButton;
     /** Radio button for graphs tab*/
@@ -89,67 +90,13 @@ public class vantageVue {
 			}
 		});
 	}
-	/** Initializing the clock values
-	 * 
-	 */
-	public void clock() {
-
-		Thread clock = new Thread() {
-			public void run() {
-				try {
-					for(;;) {
-						Calendar cal = new GregorianCalendar();	
-						int second = cal.get(Calendar.SECOND);
-						int minute = cal.get(Calendar.MINUTE);
-						int hour = cal.get(Calendar.HOUR);
-						String curTime = String.format("%02d:%02d:%02d", hour, minute,second);
-
-						clockLabel.setText("Time:  "+curTime);
-
-						sleep(1000);
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-		clock.start();
-	}
-	/** Initializing the date values
-	 * 
-	 */
-	public void date() {
-
-		Thread date = new Thread() {
-			public void run() {
-				try {
-					for(;;) {
-						Calendar cal = new GregorianCalendar();
-						int month = 01;
-						int day = cal.get(Calendar.DAY_OF_MONTH);
-						int year = cal.get(Calendar.YEAR);
-						String curTime = String.format("%02d/%02d/%02d", month, day, year);
-						dateLabel.setText("Date:  "+curTime);
-
-						sleep(1000);
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-		date.start();
-	}
-
+	
 	/**
 	 * Creating the application (Constructor).
 	 */
 	public vantageVue() {
 		initialize();
-		clock();
-		date();
+	
 	}
 
 	/**
@@ -204,8 +151,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-				panel.add(labelGraph);
-				panel.add(graph);
+			
 				panel.repaint();
 			}
 		});
@@ -214,15 +160,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-				panel.add(labelWeatherCenter);
-				panel.add(labelHumid);
-				panel.add(labelTemperature);
-				panel.add(labelYesTemp);
-				panel.add(labelChange);
-				panel.add(labelRain);
-				panel.add(labelWind);
-				panel.add(labelBarometer);
-				panel.add(labelAlarm);
+			
 				panel.repaint();
 			}
 		});
@@ -231,8 +169,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-				panel.add(labelMoonPhase);
-				panel.add(moonPhaseImage);
+			
 				panel.repaint();
 			}
 		});
@@ -242,10 +179,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-				panel.add(clockLabel);
-				panel.add(dateLabel);
-				panel.add(labelWelcome);
-				panel.add(labelTemp);
+			        panel.add(labelWelcome);
 				panel.repaint();
 			}
 		});
@@ -274,17 +208,7 @@ public class vantageVue {
 		jFrame.getContentPane().add(panel);
 		panel.setLayout(null);
 
-		/** clock label to be placed at home tab */
-		clockLabel = new JLabel("clock");
-		clockLabel.setBounds(20, 140, 138, 79);
-		clockLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(clockLabel);
-
-		/** date label to be placed at home tab */
-		dateLabel = new JLabel("date");
-		dateLabel.setBounds(20, 90, 217, 79);
-		dateLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(dateLabel);
+	
 
 		/** welcome label to be placed at home tab */
 		labelWelcome = new JLabel("Welcome to Davis's Vantage Vue");
@@ -292,93 +216,9 @@ public class vantageVue {
 		labelWelcome.setFont(new Font("Tahoma", Font.PLAIN, 23));
 		panel.add(labelWelcome);
 
-		/** weather center title label to be placed at weather center tab */
-		labelWeatherCenter = new JLabel("Weather Center");
-		labelWeatherCenter.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		labelWeatherCenter.setBounds(10, 1,500,50);
+	
+		
 
-		/**temperature label to be placed at home tab */
-		w.updateTemp();
-		int temp = w.getCurrentTemp();
-		labelTemp = new JLabel("Current Temperature: "+ temp+"\u00B0"+"F");
-		labelTemp.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		labelTemp.setBounds(20, 170, 240, 150);
-		panel.add(labelTemp);
-
-		/** temperature label to be placed at weather center tab */
-		labelTemperature = new JLabel("Current Temperature: "+ temp+ "\u00B0"+"F");
-		labelTemperature.setBounds(30,5 , 209, 200);
-		labelTemperature.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
-
-		/** humidity label to be placed at weather center tab */
-		w.updateHumidity();
-		int humidity = w.getHumidity();
-		labelHumid = new JLabel("Current Humidity: "+ humidity + "%");
-		labelHumid.setBounds(30,30,209,200);
-		labelHumid.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
-		/** yesterday's temperature label to be placed at weather center tab */
-		int yestTemp = 	w.getYesterdayTemp();
-		labelYesTemp = new JLabel("Yesterday's Temperature: "+ yestTemp+"\u00B0"+"F");
-		labelYesTemp.setBounds(30,55,400,200);
-		labelYesTemp.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
-		/**change in temperature label to be placed at weather center tab */
-		int change = 	w.getTempChange();
-		labelChange = new JLabel("Change in Weather Since Yesterday: "+ change+"\u00B0"+"F");
-		labelChange.setBounds(30,80,400,200);
-		labelChange.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
-		/** rain label to be placed at weather center tab */
-		w.updateRain();
-		String rain = 	w.getRain();
-		labelRain = new JLabel("Expectation of Rain: "+ rain);
-		labelRain.setBounds(30,105,400,200);
-		labelRain.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
-		/** wind speed label to be placed at weather center tab */
-		w.updateWindSpeed();
-		int wind = 	w.getWindSpeed();
-		labelWind = new JLabel("Wind Speed: "+ wind +" mph");
-		labelWind.setBounds(30,130,400,200);
-		labelWind.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
-		/** Barometer label to be placed at weather center tab */
-		w.updateBarometer();
-		String barometric = w.getBarometer();
-		labelBarometer = new JLabel("Status of Barometric Pressure: "+barometric);
-		labelBarometer.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		labelBarometer.setBounds(30, 155,500,200);
-
-		/** Alarm label to be placed at weather center tab */
-		labelAlarm = new JLabel("You will be alarmed in severe weather cases.");
-		labelAlarm.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		labelAlarm.setBounds(30, 180,500,200);
-
-		/** MoonPhase title to be placed at moon phase tab */
-		labelMoonPhase = new JLabel("Moon Phase");
-		labelMoonPhase.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		labelMoonPhase.setBounds(10, 1,500,50);
-
-		/** Moon Phase image to be placed at moon phase tab*/
-		w.updateMoonPhase();
-		String moonPhase = w.getMoonPhase();
-		moonPhaseImage = new JLabel("");
-		moonPhaseImage.setBackground(Color.WHITE);
-		moonPhaseImage.setIcon(new ImageIcon(getClass().getResource("/"+moonPhase+".GIF")));
-		moonPhaseImage.setBounds(160, 20,400,300);
-
-		/** graphs title label to be placed at graphs tab */
-		labelGraph = new JLabel("Graphs");
-		labelGraph.setFont(new Font("Tahoma", Font.PLAIN, 23));
-		labelGraph.setBounds(10, 1,500,50);
-
-		/** graphs image to be placed at graphs tab */
-		graph = new JLabel("");
-		graph.setBackground(Color.WHITE);
-		graph.setIcon(new ImageIcon(getClass().getResource("/temp.png")));
-		graph.setBounds(50, 50,400,300);
 
 	}
 }
