@@ -45,7 +45,7 @@ public class Network {
 	public void sendToStorage() {
 		HashMap<WeatherType, Double> aMap =  myOWM.getCurrent();
 		for (WeatherType t : aMap.keySet()) {
-			myStorage.add(t, null, aMap.get(t));
+			myStorage.add(t, aMap.get(t));
 		}
 	}
 

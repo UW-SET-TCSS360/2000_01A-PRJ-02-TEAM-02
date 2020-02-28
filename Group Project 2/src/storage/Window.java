@@ -11,6 +11,7 @@ package storage;
  *
  */
 public enum Window {
+	current("2.5 Seconds"),
 	hours("Hours"),
 	days("Days"),
 	months("Months");

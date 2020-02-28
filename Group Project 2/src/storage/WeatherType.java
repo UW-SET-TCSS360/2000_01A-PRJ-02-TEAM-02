@@ -55,5 +55,5 @@ public enum WeatherType {
 	 */
 	public String getUnits() {
 		return myUnits;
-	}
+	}	
 }

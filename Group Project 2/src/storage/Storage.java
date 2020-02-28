@@ -1,166 +1,109 @@
+/*
+ * Project 1: Prepared for TCSS360 
+ * By: Rory Fisher, Bree S. Dinish-Lomelli, Elias Hanna Salmo, Geoffrey Thomas Woulf, Kero Adib.
+ */
+
 package storage;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
- * Stores weather info up to 25 months, with incremental measurements of the first 25 days, and 25 hours.
+ * Stores weather info up to 26 months Allows efficient reads and writes for
+ * specified weather via hasmap and enums
  * 
- * @author Rory Fisher
  * @author Geoffrey Woulf
  */
 public class Storage {
 
-	private HashMap<WeatherType, LinkedLog> weather;
-		
 	/**
-	 * 
+	 * The map of the weather data logs.
+	 * These logs further divide the data into various timeframes, as is detailed by the window 
+	 * enum.
+	 */
+	private HashMap<WeatherType, Log> weather;
+
+	/**
+	 * Initializes a blank instance of the storage class, with initialized logs for each
+	 * of the weather types supported.
 	 */
 	public Storage() {
-		
-		weather = new HashMap<WeatherType, LinkedLog>();
-		
-		for(WeatherType type : WeatherType.values()) {
-			
-			weather.put(type, new LinkedLog());
-			
+
+		weather = new HashMap<WeatherType, Log>();
+
+		for (WeatherType type : WeatherType.values()) {
+
+			weather.put(type, new Log());
+
 		}
-		
-	}
-	
-	/**
-	 * 
-	 */
-	public Storage(HashMap<WeatherType, Double[]> theHours, HashMap<WeatherType, Double[]> theDays, HashMap<WeatherType, Double[]> theMonths) {
-		
-		weather = new HashMap<WeatherType, LinkedLog>();
-		
-		for(WeatherType type : WeatherType.values()) {
-			
-			weather.put(type, new LinkedLog(theHours.get(type), theDays.get(type), theMonths.get(type)));
-			
-		}
-		
-	}
-	
-	/**
-	 * 
-	 */
-	public Storage(HashMap<WeatherType, Double[]> theHours, HashMap<WeatherType, Double[]> theHourLows,
-			HashMap<WeatherType, Double[]> theDays, HashMap<WeatherType, Double[]> theDayLows,
-			HashMap<WeatherType, Double[]> theMonths, HashMap<WeatherType, Double[]> theMonthLows) {
-		
-		weather = new HashMap<WeatherType, LinkedLog>();
-		
-		for(WeatherType type : WeatherType.values()) {
-			
-			weather.put(type, new LinkedLog(theHours.get(type), theHourLows.get(type), theDays.get(type), theDayLows.get(type), theMonths.get(type), theMonthLows.get(type)));
-			
-		}
-		
+
 	}
 
 	/**
-	 * Allows the bulk adding to all logs whose weather types are included in an input map.
-	 * @param theWindow The time window being targete.d
-	 * @param theMeasurements The map of measurements to be added, may support any proportion of the basic weather types as is listed in the weather types enumerator.
+	 * Creates a test copy of the storage with pre-initialized days, hours, and
+	 * months.
 	 */
-	public void addBulk(Window theWindow, HashMap<WeatherType, Double> theMeasurements) {
-		for(WeatherType type : theMeasurements.keySet()) {
+	public Storage(HashMap<WeatherType, Double[]> Hours, HashMap<WeatherType, Double[]> Days,
+			HashMap<WeatherType, Double[]> Months) {
+		weather = new HashMap<WeatherType, Log>();
+
+		for (WeatherType type : WeatherType.values()) {
 			
-			weather.get(type).addAtTime(theWindow, theMeasurements.get(type));
-			
+			weather.put(type, new Log(Hours.get(type), Days.get(type), Months.get(type)));
+
 		}
 	}
-	
-	/**
-	 * Allows the bulk adding to all logs whose weather types are included in an input map.
-	 * @param theWindow The time window being targete.d
-	 * @param theHighs The map of high measurements to be added, may support any proportion of the basic weather types as is listed in the weather types enumerator.
-	 * @param theLows The map of low measurements to be added, may support any proportion of the basic weather types, but must at least support all weather types listed in the high measurements map.
-	 */
-	public void addBulk(Window theWindow, HashMap<WeatherType, Double> theHighs, HashMap<WeatherType, Double> theLows) {
-		for(WeatherType type : theHighs.keySet()) {
-			
-			weather.get(type).addAtTime(theWindow, theHighs.get(type), theLows.get(type));
-			
-		}
-	}
-	
+
 	/**
 	 * Add a reading to the appropriate log
 	 * 
-	 * 	
-	 * @param theType A value specifying the kind of measurement.
-	 * @param theWindow  The time window this data is targeting.
-	 * @param theMeasurement The value of the measurement.
+	 * @param type        Enum specifying the kind of measurement
+	 * @param measurement The value of the measurement
 	 */
-	public void add(WeatherType theType, Window theWindow, double theMeasurement) {
-		
-		weather.get(theType).addAtTime(theWindow, theMeasurement);
-		
+	public void add(WeatherType type, double measurement) {
+
+		weather.get(type).logWeather(measurement);
+
 	}
-	
-	/**
-	 * Add a reading to the appropriate log
-	 * 
-	 * @param theType A value specifying the kind of measurement.
-	 * @param theWindow  The time window this data is targeting.
-	 * @param theHigh The high value for this time window.
-	 * @param theLow The low value for this time window.
-	 */
-	public void add(WeatherType theType, Window theWindow, double theHigh, double theLow) {
-		
-		weather.get(theType).addAtTime(theWindow, theHigh, theLow);
-		
-	}
-	
+
 	/**
 	 * Retrieve appropriate weather log for graphing purposes
 	 * 
-	 * @param type The type of measure to look up
+	 * @param type   The type of measure to look up
 	 * @param window The period of time we are interested in
-	 * @param high Boolean flag- period high = true, period low = false
+	 * @param high   Boolean flag- period high = true, period low = false
 	 * @return The specified record of measures, or null if not found.
 	 */
-	public List<Double> getHistory(WeatherType type, Window window, boolean high) {
-		
+	public double[] getHistory(WeatherType type, Window window, boolean high) {
+
 		return weather.get(type).getLog(window, high);
-		
+
 	}
-	
+
 	/**
-	 * Gets the length of all logs such that the bounds of each log may be properly respected.
-	 * Once the logs reach 25 elements, it may become unnecessary to continue calling this method, as 
-	 * once the logs reach 25 elements, they will consistently be 25 elements long.
+	 * Returns the values for all WeatherTypes at a specific window of time. Calling
+	 * getAllAtTime(WeatherType.CURRENT, 0) gets the most recent data. Calling
+	 * getAllAtTime(WeatherType.DAY, 1) gets yesterdays set of data.
 	 * 
-	 * @param theWindow theWindow of time whose bounds we are checking.
-	 * @return A map containing the lengths of each log. In most cases, all logs will be of equal length.
-	 */
-	public HashMap<WeatherType, Integer> getLogLengths(Window theWindow){
-		HashMap<WeatherType, Integer> toReturn = new HashMap<>();
-		for (WeatherType t : WeatherType.values()) {
-			toReturn.put(t, weather.get(t).getLength(theWindow));
-		}
-		return toReturn;
-		
-	}
-	
-	/**
-	 * Returns the values for all WeatherTypes at a specific window of time.
-	 * Calling getAllAtTime(WeatherType.CURRENT, 0) gets the most recent data.
-	 * Calling getAllAtTime(WeatherType.DAY, 1) gets yesterdays set of data.
-	 * @param The window corresponding to the timescale the request is being made at.
+	 * @param The window corresponding to the timescale the request is being made
+	 *            at.
 	 * @param The number of time units that reflects the most current window.
-	 * @return A map that associates each measurement with its respective weather type.
+	 * @return A map that associates each measurement with its respective weather
+	 *         type.
 	 */
-	public HashMap<WeatherType, Double> getAllAtTime(Window theWindow, int theOffset, boolean theHigh){
-		HashMap<WeatherType, Double> toReturn =  new HashMap<>();
-		for(WeatherType t : WeatherType.values()) {
-			toReturn.put(t, weather.get(t).getAtTime(theWindow, theOffset, theHigh));
+	public HashMap<WeatherType, Double> getAllAtTime(Window theWindow, int displacement) {
+		if (displacement > 24) {
+			throw new IllegalArgumentException();
+		}
+		HashMap<WeatherType, Double> toReturn = new HashMap<>();
+		for (WeatherType t : weather.keySet()) {
+			double[] data = weather.get(t).getLog(theWindow, true);
+			//The current data is always at index zero.
+			if (theWindow== Window.current) toReturn.put(t, data[displacement]);
+			//The long term most recent is always at the last index.
+			else toReturn.put(t, data[data.length-1-displacement]); // Get the desired element of the current time window, in T-1.
 		}
 		return toReturn;
-		
+
 	}
-	
+
 }
