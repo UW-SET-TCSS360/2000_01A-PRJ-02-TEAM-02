@@ -127,8 +127,8 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 		myLowerPanel.add(comboBox);
 		myLowerPanel.add(submit);
 		this.add(myUpperPanel, BorderLayout.NORTH);
-		this.add(myLowerPanel, BorderLayout.SOUTH);
 		this.add(existingAlerts, BorderLayout.CENTER);
+		this.add(myLowerPanel, BorderLayout.SOUTH);
 		
 		//Setting up a button for setting the alerts
 		submit.addActionListener(new ActionListener()
@@ -254,7 +254,7 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 				{
 					if (currentAlerts.get(j) <= info.get(j))
 					{
-						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " ≥ " + currentAlerts.get(j));
+						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " ≤ " + currentAlerts.get(j));
 						list.removeElement(currentAlerts.get(j) + " ≤ " + j.toString());
 						currentAlerts.remove(j);
 						comparators.remove(j);
@@ -264,7 +264,7 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 				{
 					if (currentAlerts.get(j) >= info.get(j))
 					{
-						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " ≤ " + currentAlerts.get(j));
+						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " ≥ " + currentAlerts.get(j));
 						list.removeElement(currentAlerts.get(j) + " ≥ " + j.toString());
 						currentAlerts.remove(j);
 						comparators.remove(j);
@@ -273,7 +273,82 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 			}
 		}
 	}
-
+	
+	public Map<WeatherType, Boolean> updateDataTest(Map<WeatherType, Double> info)
+	{
+		HashMap<WeatherType, Boolean> returnValue = new HashMap<WeatherType, Boolean>();
+		for (int i = 0; i < WeatherType.values().length; i++)
+		{
+			WeatherType j = WeatherType.values()[i];
+			if (currentAlerts.containsKey(j))
+			{
+				if (comparators.get(WeatherType.values()[i]).equals("<"))
+				{
+					if (currentAlerts.get(j) < info.get(j))
+					{
+						returnValue.put(j, true);
+						currentAlerts.remove(j);
+						comparators.remove(j);
+					}
+					else
+					{
+						returnValue.put(j, false);
+					}
+				}
+				else if (comparators.get(WeatherType.values()[i]).equals(">"))
+				{
+					if (currentAlerts.get(j) > info.get(j))
+					{
+						returnValue.put(j, true);
+						currentAlerts.remove(j);
+						comparators.remove(j);
+					}
+					else
+					{
+						returnValue.put(j, false);
+					}
+				}
+				else if (comparators.get(WeatherType.values()[i]).equals("≤"))
+				{
+					if (currentAlerts.get(j) <= info.get(j))
+					{
+						returnValue.put(j, true);
+						currentAlerts.remove(j);
+						comparators.remove(j);
+					}
+					else
+					{
+						returnValue.put(j, false);
+					}
+				}
+				else if (comparators.get(WeatherType.values()[i]).equals("≥"))
+				{
+					if (currentAlerts.get(j) >= info.get(j))
+					{
+						returnValue.put(j, true);
+						currentAlerts.remove(j);
+						comparators.remove(j);
+					}
+					else
+					{
+						returnValue.put(j, false);
+					}
+				}
+			}
+		}
+		return returnValue;
+	}
+	
+	public void registerAlerts(WeatherType type, double alert)
+	{
+		currentAlerts.put(type, alert);
+	}
+	
+	public void registerAlerts(Map<WeatherType, Double> alerts)
+	{
+		currentAlerts.putAll(alerts);
+	}
+	
 	/**
 	 * Returns alarmPanel
 	 * @return alarmPanel
@@ -281,6 +356,35 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 	public JPanel getAlertsPanel()
 	{
 		return this;
+	}
+
+	/**
+	 * @return the currentAlerts
+	 */
+	public Map<WeatherType, Double> getCurrentAlerts()
+	{
+		return currentAlerts;
+	}	
+
+	/**
+	 * @return the comparators
+	 */
+	public Map<WeatherType, String> getComparators()
+	{
+		return comparators;
+	}
+	
+	public void setComparators(WeatherType type, String comparator)
+	{
+		comparators.put(type, comparator);
+	}
+
+	/**
+	 * @return the list
+	 */
+	public DefaultListModel<String> getList()
+	{
+		return list;
 	}
 
 }
