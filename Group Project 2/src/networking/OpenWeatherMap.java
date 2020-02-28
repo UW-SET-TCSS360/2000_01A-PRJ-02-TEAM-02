@@ -7,23 +7,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
+import storage.WeatherType;
+import storage.Window;
 
 /**
+ * Getting data from Open Weather Map. It is a paid application. 
+ * To get all functions like hourly, daily or monthly forecast, 
+ * we have to pay $180 / month. Using this module, we only have
+ * some data for free. For example, we can get 5 days data and the current weather from the
+ * Open Weeather Map. I use these data and simulate new data.
+
+ * 
  * @author pham19@uw.edu, michaelphamn@gmail.com
+ * 
  *
  */
 public class OpenWeatherMap {
-	private String apiBase;
-	private String apiForecast;
-	private String apiKey;
-	private String units;
-	private String lang;
-
-	
 	/**
 	 * Initial parameters for Open Weather Map API.
 	 * apiBase: weather information at current day;
@@ -31,13 +34,156 @@ public class OpenWeatherMap {
 	 * units: the units. For example, Fahrenheit or Cencius. 
 	 * lang: language.
 	 * apiKey: 594e9de078a3ccde7630bc9017a457ff.
+	 * @throws JSONException 
+	 * @throws IOException 
 	 */
-	public OpenWeatherMap() {
-		apiBase = "http://api.openweathermap.org/data/2.5/weather?zip=";
-		apiForecast = "http://api.openweathermap.org/data/2.5/forecast?zip=";
-		apiKey = "594e9de078a3ccde7630bc9017a457ff";
-		units = "imperial";
-		lang = "en";
+	private String apiBase = "http://api.openweathermap.org/data/2.5/weather?zip=";
+	private String apiForecast = "http://api.openweathermap.org/data/2.5/forecast?zip=";
+	private String apiKey = "594e9de078a3ccde7630bc9017a457ff";
+	private String units = "imperial";
+	private String lang = "en";
+	
+	/**
+	 * The currently saved weather values.
+	 */
+	private HashMap<WeatherType, Double> myCurrent;
+
+	/**
+	 * The assumed minimum reasonable value for any given weather type.
+	 */
+	private Map<WeatherType, Double> myBase;
+
+	/**
+	 * The range of possible weather values (How much higher the highest value can
+	 * be then the values base.
+	 */
+	private Map<WeatherType, Double> myRange;
+
+	/**
+	 * Provides exponents to control the flow of the simulator.
+	 */
+	private Map<Window, Double> timeExponents;
+
+
+	public OpenWeatherMap() {		
+		String location = "98402,us";			
+		JSONObject obj;
+		String description;		
+		try {
+			obj = fetch(location);
+			
+			timeExponents = new HashMap<>();
+			timeExponents.put(Window.hours, 0.85);
+			timeExponents.put(Window.days, 0.65);
+			timeExponents.put(Window.months, 0.38);	
+			
+			// Initialize the base values for the updating weather types.
+			myBase = new HashMap<>();
+			myBase.put(WeatherType.temp, 60.);
+			myBase.put(WeatherType.outtemp, obj.getJSONObject("main").getDouble("temp"));
+			myBase.put(WeatherType.humidity, 15.);
+			myBase.put(WeatherType.outhumidity, 50.);
+			myBase.put(WeatherType.rainRate, 0.1);
+			/**
+			 * Open Weather Map doesn't contain rain, simulating the rain base on the description of current weather  
+			 */
+			 description = obj.getJSONArray("weather").getJSONObject(0).get("description").toString();
+			/**
+			 * description of current weather may clear sky, few clouds, scattered clouds, broken clouds, shower rain, rain,
+			 * thunderstorm, snow, or mist
+			 */			
+			double ran = Math.random();
+			int MaxShowerRain = 16;
+			int MinShowerRain = 4;
+			
+			int MaxRain = 4;
+			int MinRain = 0;
+			
+			int MaxThunderstom = 100;
+			int MinThunderstom = 20;
+			
+			double rain = 0.0;
+			switch(description) {
+				case "shower rain":
+					rain = MaxShowerRain + ran * MinShowerRain;
+					break;
+				case "rain":
+					rain = MinRain + ran * MaxRain;
+					break;
+				case "thunderstorm":
+					rain = MaxThunderstom + ran * MinThunderstom;;
+					break;
+			}
+			myBase.put(WeatherType.rain, rain);
+			myBase.put(WeatherType.windchill, 10.);
+			myBase.put(WeatherType.wind, obj.getJSONObject("wind").getDouble("speed"));
+			myBase.put(WeatherType.winddir, obj.getJSONObject("wind").getDouble("deg"));
+			myBase.put(WeatherType.barometric, obj.getJSONObject("main").getDouble("pressure"));
+			
+			// Initializes the base values for the ranges.
+			myRange = new HashMap<>();
+			myRange.put(WeatherType.temp, 20.);
+			myRange.put(WeatherType.outtemp, 90.);
+			myRange.put(WeatherType.humidity, 80.);
+			myRange.put(WeatherType.outhumidity, 50.);
+			myRange.put(WeatherType.rainRate, 0.6);
+			myRange.put(WeatherType.rain, 4.2);
+			myRange.put(WeatherType.windchill, 30.);
+			myRange.put(WeatherType.wind, 15.);
+			myRange.put(WeatherType.winddir, 360.);
+			myRange.put(WeatherType.barometric, 0.06);
+			
+			
+			//generate the initial current values.
+			myCurrent = new HashMap<WeatherType, Double>();			
+			/**
+			 * Simulate indoor temperature
+			 */
+			myCurrent.put(WeatherType.temp, myBase.get(WeatherType.temp) + ran * myRange.get(WeatherType.temp));
+			
+			/**
+			 * Outdoor temperature from Open Weather
+			 */
+			myCurrent.put(WeatherType.outtemp, myBase.get(WeatherType.outtemp) + ran * myRange.get(WeatherType.outtemp));
+			
+			/**
+			 * Simulate indoor humidity
+			 */
+			myCurrent.put(WeatherType.humidity,myBase.get(WeatherType.humidity) + ran * myRange.get(WeatherType.humidity));
+			
+			/**
+			 * Outdoor humidity from Open Weather
+			 */
+			myCurrent.put(WeatherType.outhumidity, obj.getJSONObject("main").getDouble("humidity"));
+			
+			/**
+			 * Simulate rain rate
+			 */
+			myCurrent.put(WeatherType.rainRate, myBase.get(WeatherType.rainRate) + ran * myRange.get(WeatherType.rainRate));
+			
+			/**
+			 * Simulate rain
+			 */
+			myCurrent.put(WeatherType.rain, myBase.get(WeatherType.rain) + ran * myRange.get(WeatherType.rain));
+			
+			/**
+			 * Simulate wind chill
+			 */
+			myCurrent.put(WeatherType.windchill,myBase.get(WeatherType.windchill) + ran * myRange.get(WeatherType.windchill));
+			
+			/**
+			 * wind speed, wind direction, and pressure from Open Weather
+			 */
+			myCurrent.put(WeatherType.wind, myBase.get(WeatherType.wind) + ran * myRange.get(WeatherType.wind));
+			myCurrent.put(WeatherType.winddir, myBase.get(WeatherType.winddir) + ran * myRange.get(WeatherType.winddir));
+			myCurrent.put(WeatherType.barometric,myBase.get(WeatherType.barometric) + ran * myRange.get(WeatherType.barometric));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 	
 	/**
@@ -113,7 +259,18 @@ public class OpenWeatherMap {
 	}
 
 	/**
-	 * Return a sentence describing the weather
+	 * retrieve a string list of the current weather (for example:) at a specific zipcode 
+	 * {"coord":{"lon":2.35,"lat":48.86},
+	 *	"weather":[{"id":701,"main":"Mist","description":"mist","icon":"50n"}],
+	 *	"base":"stations",
+	 *	"main":{"temp":10.37,"pressure":1037,"humidity":93,"temp_min":10,"temp_max":11},
+	 *	"visibility":6000,
+	 *	"wind":{"speed":2.1,"deg":270},
+	 *	"clouds":{"all":90},
+	 *	"dt":1513884600,
+	 *	"sys":{"type":1,"id":5610,"message":0.0029,"country":"FR","sunrise":1513842107,"sunset":1513871796},
+	 *	"id":2988507,"name":"Paris","cod":200
+	 * }
 	 * @throws IOException 
 	 */
 	public JSONObject fetch(final String location) throws IOException, JSONException {
@@ -135,21 +292,6 @@ public class OpenWeatherMap {
 
 
 	/**
-	 * retrieve a string list of the current weather (for example:)
-	 * 
-	 *{"coord":{"lon":2.35,"lat":48.86},
-	 *"weather":[{"id":701,"main":"Mist","description":"mist","icon":"50n"}],
-	 *"base":"stations",
-	 *"main":{"temp":10.37,"pressure":1037,"humidity":93,"temp_min":10,"temp_max":11},
-	 *"visibility":6000,
-	 *"wind":{"speed":2.1,"deg":270},
-	 *"clouds":{"all":90},
-	 *"dt":1513884600,
-	 *"sys":{"type":1,"id":5610,"message":0.0029,"country":"FR","sunrise":1513842107,"sunset":1513871796},
-	 *"id":2988507,"name":"Paris","cod":200}
-	 */
-
-	/**
 	 * Return a sentence describing the forecast weather
 	 */
 	public JSONObject fetch(String location, int nbDay) throws IOException, JSONException {
@@ -168,116 +310,95 @@ public class OpenWeatherMap {
 		JSONObject obj = new JSONObject(response.toString());
 		return obj;
 	}
+	
+	/**
+	 * On a new day, reset specific values to reflect a reality where we measure
+	 * these values within the scope of that specific day, such as rain.
+	 */
+	public void newDay() {
+		myCurrent.put(WeatherType.rain, 0.0);
+	}
+	
+	public void updateCurrent() {
+		for (WeatherType t : myCurrent.keySet()) {
 
-//	/**
-//	       /**    
-//	 * retrieve a string list of weather for the next (max) 5 day  (40 periods of 3 hours) indicated by dayIndex 0 <=
-//	 * dayIndex <= 40 (Note: 0 & 40 give the forecast for all the periods). (for example PeriodIndex=3 :)
-//	 * 
-//	 * {"city":{"id":2802985,"name":"location","coord":{"lon":5.8581,"lat":50.7019},"country":"FR","population":0},
-//	 * "cod":"200", "message":0.1309272, 
-//	 * "cnt":3, 
-//	 * "list":
-//	 *   
-//	 * [{"dt":1505386800,
-//	 * "temp":{"day":11.62,"min":10.59,"max":12.39,"night":11.01,"eve":10.59,"morn":10.98},
-//	 * "pressure":1006.58, "humidity":100,
-//	 * "weather":[{"id":502,"main":"Rain","description":"heavy intensity
-//	 * rain","icon":"10d"}], "speed":6.73, "deg":259, "clouds":92, "rain":17.33},   *
-//	 * 
-//	 * {"dt":1505473200,
-//	 * "temp":{"day":14.96,"min":8.43,"max":14.96,"night":8.43,"eve":12.71,"morn":9.46},
-//	 * "pressure":1014.87, "humidity":89,
-//	 * "weather":[{"id":500,"main":"Rain","description":"light
-//	 * rain","icon":"10d"}], "speed":4.8, "deg":249, "clouds":20, "rain":0.36},
-//	 * 
-//	 * {"dt":1505559600,
-//	 * "temp":{"day":13.85,"min":8.09,"max":14.5,"night":8.44,"eve":12.5,"morn":8.09},
-//	 * "pressure":1013.37, "humidity":95,
-//	 * "weather":[{"id":501,"main":"Rain","description":"moderate
-//	 * rain","icon":"10d"}], "speed":5.38, "deg":241, "clouds":44, "rain":5.55} ]}
-//	 *
-//	 * @throws JSONException 
-//	 * @throws IOException 
-//	 * @throws ClientProtocolException 
-//	 */ 
-//
-//
-//	public String[] fetchCurrentWeather(String location) throws IOException, JSONException {
-//		String[] result = new String[11];
-//		result[0] = "error";
-//		try {
-//			JSONObject obj = fetch(location);
-//			result[0] = obj.getJSONArray("weather").getJSONObject(0).get("description").toString();
-//			result[1] = obj.getJSONObject("main").get("temp").toString();
-//			result[2] = location;
-//			result[3] = obj.getJSONArray("weather").getJSONObject(0).get("id").toString();
-//			result[4] = obj.getJSONObject("main").get("pressure").toString();
-//			result[5] = obj.getJSONObject("main").get("humidity").toString();
-//			result[6] = obj.getJSONObject("main").get("temp_min").toString();
-//			result[7] = obj.getJSONObject("main").get("temp_max").toString();
-//			result[8] = obj.getJSONObject("wind").get("speed").toString();
-//			result[9] = obj.getJSONObject("wind").get("deg").toString();
-//			result[10] = obj.getJSONObject("clouds").get("all").toString();			
-//			return result;
-//		} catch (Exception e) {
-//			return result;
-//		}
-//	}
-//
-//	public String[] fetchForecast(String location, int dayIndex) throws IOException, JSONException {
-//		String[] result = new String[11];
-//		String localUnits = "fahrenheit";
-//		if ((dayIndex >= 1) && (dayIndex <= 6)) {
-//			JSONObject jsonObj = null;
-//			try {
-//				jsonObj = fetch(location, (dayIndex));				
-//			} catch (IOException | JSONException e) {
-//				return null;
-//			}
-//			
-//			// Getting the list node
-//			JSONArray list;
-//			try {
-//				list = jsonObj.getJSONArray("list");
-//			} catch (JSONException e) {
-//				return null;
-//			}
-//			// Getting the required element from list by dayIndex
-//			JSONObject item = list.getJSONObject(dayIndex - 1);
-//			result[0] = item.getJSONArray("weather").getJSONObject(0).get("description").toString();
-//			JSONObject main = item.getJSONObject("main");
-//			result[1] = main.get("temp").toString();
-//			result[2] = location;
-//			result[3] = item.getJSONArray("weather").getJSONObject(0).get("id").toString();
-//			result[4] = main.get("pressure").toString();
-//			result[5] = main.get("humidity").toString();
-//			result[6] = main.get("temp_min").toString();
-//			result[7] = main.get("temp_max").toString();
-//			JSONObject wind = item.getJSONObject("wind");
-//			result[8] = wind.get("speed").toString();
-//			result[9] = wind.get("deg").toString();
-//			result[10] = localUnits;
-//		} else {
-//			return null;
-//		}
-//		return result;
-//	}
-//
-//	
-//
-//	public static void main(String[] args) {
-//		OpenWeatherMap owm = new OpenWeatherMap();
-//		try {
-//			String[] fetchForecast = owm.fetchForecast("94040,us", 6);			
-////			String sentence = "("+fetchForecast[3]+") In " + fetchForecast[2] + " the weather is " + fetchForecast[0] + ".  " + fetchForecast[1] + " degrees " + fetchForecast[10];
-////			System.out.println(sentence);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (JSONException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+			// Make the new value, which is going to be 95% the current value, and 5% some
+			// random value in
+			// the same range.
+			double currentValue = 0;
+			if (t == WeatherType.rain) {
+				currentValue = myCurrent.get(t) + myCurrent.get(WeatherType.rainRate) * 1.0 / 1440.0;
+				// Our storage is built for the weather requests to be made every 2.5 seconds.
+			} else if (t == WeatherType.rainRate) {
+				currentValue = myBase.get(t) + Math.random() * myRange.get(t); // Rain speed follows less logical rules
+																				// then other measures.
+			} else if (t == WeatherType.windchill) {
+				// Use commonly available wind chill formula if the temperature is below 50
+				// degrees.
+				// https://web.archive.org/web/20110918010232/http://www.weather.gov/os/windchill/index.shtml
+				// Thank you national weather service.
+				if (myCurrent.get(WeatherType.outtemp) <= 50.0) {
+					currentValue = 35.74 + myCurrent.get(WeatherType.outtemp) * 0.6215
+							- 35.75 * Math.pow(myCurrent.get(WeatherType.wind), 0.16)
+							+ 0.4275 * myCurrent.get(WeatherType.outtemp)
+									* Math.pow(myCurrent.get(WeatherType.wind), 0.16);
+					// What an ugly formula.
+				} else
+					currentValue = myCurrent.get(WeatherType.outtemp);
+				// Else assume percieved temperature is the current temperature.
+
+			} else {
+				currentValue = myCurrent.get(t)
+						+ (myBase.get(t) + Math.random() * myRange.get(t));
+			}
+
+			// Update the current value if the current value isn't related to rain.
+			// If the current value IS rain, update it if the current humidity is high
+			// enough for it to rain.
+			if (t != WeatherType.rain || myCurrent.get(WeatherType.outhumidity) > 75)
+				myCurrent.put(t, currentValue);
+		}
+	}
+	
+	public HashMap<WeatherType, Double> getCurrent() {
+		HashMap<WeatherType, Double> toReturn = new HashMap<>();
+		toReturn.putAll(myCurrent);
+		return toReturn;
+	}
+	
+	public HashMap<WeatherType, Double[]> getInitialSets(Window theTimeWindow) throws IOException, JSONException{
+		HashMap<WeatherType, Double[]> initialSet = new HashMap<>();
+		// We have to generate new data for every key in the data set.
+		// So Keys*25 data elements.
+		for (WeatherType t : myCurrent.keySet()) {
+			Double[] initialData = new Double[25];
+			//Generate the new data set.
+			//There is no rain at the start of a new day.
+			if(t == WeatherType.rain && theTimeWindow == Window.hours) {
+				myCurrent.put(t, 0.0);
+				
+			}
+			
+					
+			initialData[0] = myCurrent.get(t);
+			// The oldest data is the "Current Data."
+			for (int i = 1; i < 25; i++) {
+				//Inform the new data with the previous data.
+				if (t != WeatherType.rain || theTimeWindow != Window.hours) myCurrent.put(t, myCurrent.get(t) * timeExponents.get(theTimeWindow)
+						+ (1 - timeExponents.get(theTimeWindow)) * (myBase.get(t) + Math.random() * myRange.get(t)));
+				else {
+					//If it is rain over the hours, let it accumulate.
+					myCurrent.put(t, myCurrent.get(t)+Math.random()*myRange.get(WeatherType.rain)/24);
+					//Assume it rains ~ 15% of the time.
+				}
+				//Otherwise generate the weather data as normal.
+				initialData[i] = myCurrent.get(t);
+				// Generate a hopefully logical sequence of data for a seasonless simulator
+				// planet.
+				// Each value will be informed by the previous value.
+			}
+			initialSet.put(t, initialData);
+		}
+		return initialSet;
+	}
 }

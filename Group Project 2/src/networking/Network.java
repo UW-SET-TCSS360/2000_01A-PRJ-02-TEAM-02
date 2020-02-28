@@ -16,14 +16,14 @@ import storage.WeatherType;
 public class Network {
 
 	Storage myStorage;
-	Simulator mySimulator;
+	OpenWeatherMap myOWM;
 	/**
 	 * Initializes the network with access to the storage elements used by the front end.
 	 * @param theStorage
 	 */
-	public Network(Storage theStorage, Simulator theSimulator) {
+	public Network(Storage theStorage, OpenWeatherMap theOWM) {
 		myStorage = theStorage;
-		mySimulator = theSimulator;
+		myOWM = theOWM;
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Network {
 	 * @return True if the storage has been sent new data.
 	 */
 	public boolean checkSimulator() {
-		mySimulator.updateCurrent();
+		myOWM.updateCurrent();
 		
 		return true;
 		//Currently, as this network is simulated, it will always succeed at its task barring an exception.
@@ -43,9 +43,9 @@ public class Network {
 	 * Retrieves the most up to date values and sends them to the storage system.
 	 */
 	public void sendToStorage() {
-		HashMap<WeatherType, Double> aMap =  mySimulator.getCurrent();
+		HashMap<WeatherType, Double> aMap =  myOWM.getCurrent();
 		for (WeatherType t : aMap.keySet()) {
-			myStorage.add(t, aMap.get(t));
+			myStorage.add(t, null, aMap.get(t));
 		}
 	}
 
