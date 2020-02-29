@@ -69,7 +69,9 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 		list = new DefaultListModel<>();
 		currentAlerts = new HashMap<>();
 		comparators = new HashMap<>();
+		this.setBounds(0, 0, 483, 354);
 		setLayout(new BorderLayout());
+		this.setVisible(true);
 		setInterface();
 	}
 
@@ -129,6 +131,7 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 		this.add(myUpperPanel, BorderLayout.NORTH);
 		this.add(existingAlerts, BorderLayout.CENTER);
 		this.add(myLowerPanel, BorderLayout.SOUTH);
+		
 		
 		//Setting up a button for setting the alerts
 		submit.addActionListener(new ActionListener()
@@ -250,21 +253,21 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 						comparators.remove(j);
 					}
 				}
-				else if (comparators.get(WeatherType.values()[i]).equals("≤"))
+				else if (comparators.get(WeatherType.values()[i]).equals("â‰¤"))
 				{
 					if (currentAlerts.get(j) <= info.get(j))
 					{
-						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " ≤ " + currentAlerts.get(j));
+						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " â‰¤ " + currentAlerts.get(j));
 						list.removeElement(currentAlerts.get(j) + " ≤ " + j.toString());
 						currentAlerts.remove(j);
 						comparators.remove(j);
 					}
 				}
-				else if (comparators.get(WeatherType.values()[i]).equals("≥"))
+				else if (comparators.get(WeatherType.values()[i]).equals("â‰¥"))
 				{
 					if (currentAlerts.get(j) >= info.get(j))
 					{
-						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " ≥ " + currentAlerts.get(j));
+						JOptionPane.showMessageDialog(new JFrame(), j.toString() + " â‰¥ " + currentAlerts.get(j));
 						list.removeElement(currentAlerts.get(j) + " ≥ " + j.toString());
 						currentAlerts.remove(j);
 						comparators.remove(j);
@@ -308,7 +311,7 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 						returnValue.put(j, false);
 					}
 				}
-				else if (comparators.get(WeatherType.values()[i]).equals("≤"))
+				else if (comparators.get(WeatherType.values()[i]).equals("â‰¤"))
 				{
 					if (currentAlerts.get(j) <= info.get(j))
 					{
@@ -321,7 +324,7 @@ public class AlertsPanel extends JPanel implements WeatherDataItem
 						returnValue.put(j, false);
 					}
 				}
-				else if (comparators.get(WeatherType.values()[i]).equals("≥"))
+				else if (comparators.get(WeatherType.values()[i]).equals("â‰¥"))
 				{
 					if (currentAlerts.get(j) >= info.get(j))
 					{
