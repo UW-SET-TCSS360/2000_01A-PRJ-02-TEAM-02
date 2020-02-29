@@ -142,6 +142,7 @@ public class LinkedLog implements Log {
 				myHours.removeFirst();
 				myHourLows.removeFirst();
 			}
+			break;
 		case days:
 			myDays.add(theMeasurement);
 			myDayLows.add(theMeasurement);
@@ -149,6 +150,7 @@ public class LinkedLog implements Log {
 				myDays.removeFirst();
 				myDayLows.removeFirst();
 			}
+			break;
 		case months:
 			myMonths.add(theMeasurement);
 			myMonthLows.add(theMeasurement);
@@ -156,6 +158,7 @@ public class LinkedLog implements Log {
 				myMonths.removeFirst();
 				myMonthLows.removeFirst();
 			}
+			break;
 		}
 	}
 
@@ -169,12 +172,14 @@ public class LinkedLog implements Log {
 				myHours.removeFirst();
 				myHourLows.removeFirst();
 			}
+			break;
 		case days:
 			myDays.add(theHigh);
 			myDayLows.add(theLow);
 			if (myDays.size() > 25) {
 				myDays.removeFirst();
 				myDayLows.removeFirst();
+			break;
 			}
 		case months:
 			myMonths.add(theHigh);
@@ -183,6 +188,7 @@ public class LinkedLog implements Log {
 				myMonths.removeFirst();
 				myMonthLows.removeFirst();
 			}
+			break;
 		}
 	}
 
@@ -197,16 +203,19 @@ public class LinkedLog implements Log {
 				toReturn.addAll(myHours);
 			else
 				toReturn.addAll(myHourLows);
+			break;
 		case days:
 			if (theHigh)
 				toReturn.addAll(myDays);
 			else
 				toReturn.addAll(myDayLows);
+			break;
 		case months:
 			if (theHigh)
 				toReturn.addAll(myMonths);
 			else
 				toReturn.addAll(myMonthLows);
+			break;
 		}
 		return toReturn;
 	}
@@ -221,10 +230,13 @@ public class LinkedLog implements Log {
 		switch(theWindow) {
 		case hours:
 			toReturn = myHours.size();
+			break;
 		case days:
 			toReturn = myDays.size();
+			break;
 		case months:
 			toReturn = myMonths.size();
+			break;
 		}
 		return toReturn;
 	}
@@ -242,16 +254,19 @@ public class LinkedLog implements Log {
 				toReturn = myHours.get(myHours.size() - 1 - theOffset);
 			else
 				toReturn = myHourLows.get(myHourLows.size() - 1 - theOffset);
+			break;
 		case days:
 			if (theHigh)
 				toReturn = myDays.get(myDays.size() - 1 - theOffset);
 			else
 				toReturn = myDayLows.get(myDayLows.size() - 1 - theOffset);
+			break;
 		case months:
 			if (theHigh)
 				toReturn = myMonths.get(myMonths.size() - 1 - theOffset);
 			else
 				toReturn = myMonthLows.get(myMonthLows.size() - 1 - theOffset);
+			break;
 		}
 		return toReturn;
 	}

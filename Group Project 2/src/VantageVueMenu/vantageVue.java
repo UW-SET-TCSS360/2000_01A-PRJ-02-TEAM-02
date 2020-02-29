@@ -24,6 +24,7 @@ import javax.swing.Timer;
 import networking.OpenWeatherMap;
 import storage.Storage;
 import storage.WeatherType;
+import storage.Window;
 import visualizer.AlertsPanel;
 import visualizer.GraphWrapperPanel;
 import visualizer.WeatherDataItem;
@@ -132,7 +133,14 @@ public class vantageVue {
 		HashMap<WeatherType, Double> theInitialWeather = myWeatherMap.getCurrent(); 
 		myWeatherPanel = new WeatherPanel(theInitialWeather);
 		myAlertPanel = new AlertsPanel();
-		Storage aStorage = new Storage();
+		Storage aStorage;
+		try {
+			aStorage = new Storage(myWeatherMap.getInitialSets(Window.hours),
+									myWeatherMap.getInitialSets(Window.days),
+									myWeatherMap.getInitialSets(Window.months));
+		} catch (Exception e) {
+			aStorage = new Storage();
+		}
 		myGraphPanel = new GraphWrapperPanel(aStorage, theInitialWeather);
 		myTimer = new Timer(2500, new ActionListener() {
 			@Override
