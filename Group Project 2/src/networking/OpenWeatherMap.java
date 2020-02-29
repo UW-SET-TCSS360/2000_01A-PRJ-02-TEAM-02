@@ -67,7 +67,7 @@ public class OpenWeatherMap {
 	/**
 	 * Provides exponents to control the flow of the simulator.
 	 */
-
+	private Map<Window, Double> timeExponents;
 
 	public OpenWeatherMap() {		
 		String location = "98402,us";			
@@ -75,7 +75,10 @@ public class OpenWeatherMap {
 		String description;		
 		try {
 			obj = fetch(location);
-						
+			timeExponents = new HashMap<>();
+			timeExponents.put(Window.hours, 0.85);
+			timeExponents.put(Window.days, 0.65);
+			timeExponents.put(Window.months, 0.38);		
 			// Initialize the base values for the updating weather types.
 			myBase = new HashMap<>();
 			myBase.put(WeatherType.temp, 60.);
@@ -122,8 +125,8 @@ public class OpenWeatherMap {
 			// Initializes the base values for the ranges.
 			myRange = new HashMap<>();
 			myRange.put(WeatherType.temp, 2.);
-			myRange.put(WeatherType.outtemp, 9.);
-			myRange.put(WeatherType.humidity, 8.);
+			myRange.put(WeatherType.outtemp, 4.);
+			myRange.put(WeatherType.humidity, 5.);
 			myRange.put(WeatherType.outhumidity, 5.);
 			myRange.put(WeatherType.rainRate, 00.6);
 			myRange.put(WeatherType.rain, 0.42);
@@ -180,10 +183,108 @@ public class OpenWeatherMap {
 			myCurrent.put(WeatherType.barometric,myBase.get(WeatherType.barometric) + ran * myRange.get(WeatherType.barometric));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			timeExponents = new HashMap<>();
+			timeExponents.put(Window.hours, 0.85);
+			timeExponents.put(Window.days, 0.65);
+			timeExponents.put(Window.months, 0.38);
+
+			// Initialize the base values for the updating weather types.
+			myBase = new HashMap<>();
+			myBase.put(WeatherType.temp, 60.);
+			myBase.put(WeatherType.outtemp, 15.);
+			myBase.put(WeatherType.humidity, 15.);
+			myBase.put(WeatherType.outhumidity, 50.);
+			myBase.put(WeatherType.rainRate, 0.1);
+			myBase.put(WeatherType.rain, 0.);
+			myBase.put(WeatherType.windchill, 10.);
+			myBase.put(WeatherType.wind, 0.);
+			myBase.put(WeatherType.winddir, 0.);
+			myBase.put(WeatherType.barometric, 0.97);
+
+			// Initializes the base values for the ranges.
+			myRange = new HashMap<>();
+			myRange.put(WeatherType.temp, 20.);
+			myRange.put(WeatherType.outtemp, 90.);
+			myRange.put(WeatherType.humidity, 80.);
+			myRange.put(WeatherType.outhumidity, 50.);
+			myRange.put(WeatherType.rainRate, 0.6);
+			myRange.put(WeatherType.rain, 4.2);
+			myRange.put(WeatherType.windchill, 30.);
+			myRange.put(WeatherType.wind, 15.);
+			myRange.put(WeatherType.winddir, 360.);
+			myRange.put(WeatherType.barometric, 0.06);
+
+			// Randomly generate the initial current values.
+			myCurrent = new HashMap<>();
+			myCurrent.put(WeatherType.temp, myBase.get(WeatherType.temp) + Math.random() * myRange.get(WeatherType.temp));
+			myCurrent.put(WeatherType.outtemp,
+					myBase.get(WeatherType.outtemp) + Math.random() * myRange.get(WeatherType.outtemp));
+			myCurrent.put(WeatherType.humidity,
+					myBase.get(WeatherType.humidity) + Math.random() * myRange.get(WeatherType.humidity));
+			myCurrent.put(WeatherType.outhumidity,
+					myBase.get(WeatherType.outhumidity) + Math.random() * myRange.get(WeatherType.outhumidity));
+			myCurrent.put(WeatherType.rainRate,
+					myBase.get(WeatherType.rainRate) + Math.random() * myRange.get(WeatherType.rainRate));
+			myCurrent.put(WeatherType.rain, 0.);
+			myCurrent.put(WeatherType.windchill,
+					myBase.get(WeatherType.windchill) + Math.random() * myRange.get(WeatherType.windchill));
+			myCurrent.put(WeatherType.wind, myBase.get(WeatherType.wind) + Math.random() * myRange.get(WeatherType.wind));
+			myCurrent.put(WeatherType.winddir,
+					myBase.get(WeatherType.winddir) + Math.random() * myRange.get(WeatherType.winddir));
+			myCurrent.put(WeatherType.barometric,
+					myBase.get(WeatherType.barometric) + Math.random() * myRange.get(WeatherType.barometric));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			timeExponents = new HashMap<>();
+			timeExponents.put(Window.hours, 0.85);
+			timeExponents.put(Window.days, 0.65);
+			timeExponents.put(Window.months, 0.38);
+
+			// Initialize the base values for the updating weather types.
+			myBase = new HashMap<>();
+			myBase.put(WeatherType.temp, 60.);
+			myBase.put(WeatherType.outtemp, 15.);
+			myBase.put(WeatherType.humidity, 15.);
+			myBase.put(WeatherType.outhumidity, 50.);
+			myBase.put(WeatherType.rainRate, 0.1);
+			myBase.put(WeatherType.rain, 0.);
+			myBase.put(WeatherType.windchill, 10.);
+			myBase.put(WeatherType.wind, 0.);
+			myBase.put(WeatherType.winddir, 0.);
+			myBase.put(WeatherType.barometric, 0.97);
+
+			// Initializes the base values for the ranges.
+			myRange = new HashMap<>();
+			myRange.put(WeatherType.temp, 20.);
+			myRange.put(WeatherType.outtemp, 90.);
+			myRange.put(WeatherType.humidity, 80.);
+			myRange.put(WeatherType.outhumidity, 50.);
+			myRange.put(WeatherType.rainRate, 0.6);
+			myRange.put(WeatherType.rain, 4.2);
+			myRange.put(WeatherType.windchill, 30.);
+			myRange.put(WeatherType.wind, 15.);
+			myRange.put(WeatherType.winddir, 360.);
+			myRange.put(WeatherType.barometric, 0.06);
+
+			// Randomly generate the initial current values.
+			myCurrent = new HashMap<>();
+			myCurrent.put(WeatherType.temp, myBase.get(WeatherType.temp) + Math.random() * myRange.get(WeatherType.temp));
+			myCurrent.put(WeatherType.outtemp,
+					myBase.get(WeatherType.outtemp) + Math.random() * myRange.get(WeatherType.outtemp));
+			myCurrent.put(WeatherType.humidity,
+					myBase.get(WeatherType.humidity) + Math.random() * myRange.get(WeatherType.humidity));
+			myCurrent.put(WeatherType.outhumidity,
+					myBase.get(WeatherType.outhumidity) + Math.random() * myRange.get(WeatherType.outhumidity));
+			myCurrent.put(WeatherType.rainRate,
+					myBase.get(WeatherType.rainRate) + Math.random() * myRange.get(WeatherType.rainRate));
+			myCurrent.put(WeatherType.rain, 0.);
+			myCurrent.put(WeatherType.windchill,
+					myBase.get(WeatherType.windchill) + Math.random() * myRange.get(WeatherType.windchill));
+			myCurrent.put(WeatherType.wind, myBase.get(WeatherType.wind) + Math.random() * myRange.get(WeatherType.wind));
+			myCurrent.put(WeatherType.winddir,
+					myBase.get(WeatherType.winddir) + Math.random() * myRange.get(WeatherType.winddir));
+			myCurrent.put(WeatherType.barometric,
+					myBase.get(WeatherType.barometric) + Math.random() * myRange.get(WeatherType.barometric));
 		}	
 	}
 	
@@ -359,6 +460,42 @@ public class OpenWeatherMap {
 			if (t != WeatherType.rain || myCurrent.get(WeatherType.outhumidity) > 75)
 				myCurrent.put(t, currentValue);
 		}
+	}
+	
+	public HashMap<WeatherType, Double[]> getInitialSets(Window theTimeWindow) throws IOException, JSONException{
+		HashMap<WeatherType, Double[]> initialSet = new HashMap<>();
+		// We have to generate new data for every key in the data set.
+		// So Keys*25 data elements.
+		for (WeatherType t : myCurrent.keySet()) {
+			Double[] initialData = new Double[25];
+			//Generate the new data set.
+			//There is no rain at the start of a new day.
+			if(t == WeatherType.rain && theTimeWindow == Window.hours) {
+				myCurrent.put(t, 0.0);
+				
+			}
+			
+					
+			initialData[0] = myCurrent.get(t);
+			// The oldest data is the "Current Data."
+			for (int i = 1; i < 25; i++) {
+				//Inform the new data with the previous data.
+				if (t != WeatherType.rain || theTimeWindow != Window.hours) myCurrent.put(t, myCurrent.get(t) * timeExponents.get(theTimeWindow)
+						+ (1 - timeExponents.get(theTimeWindow)) * (myBase.get(t) + Math.random() * myRange.get(t)));
+				else {
+					//If it is rain over the hours, let it accumulate.
+					myCurrent.put(t, myCurrent.get(t)+Math.random()*myRange.get(WeatherType.rain)/24);
+					//Assume it rains ~ 15% of the time.
+				}
+				//Otherwise generate the weather data as normal.
+				initialData[i] = myCurrent.get(t);
+				// Generate a hopefully logical sequence of data for a seasonless simulator
+				// planet.
+				// Each value will be informed by the previous value.
+			}
+			initialSet.put(t, initialData);
+		}
+		return initialSet;
 	}
 	
 	public HashMap<WeatherType, Double> getCurrent() {
