@@ -1,8 +1,7 @@
 /**
  * Class to create the GUI for the displaying of information from the Vantage Vue Weather Station.
  * 
- * @author Elham Jmaileh & Cynthia Pang
- * @version 2.0 02-18-2020
+ * @author Cynthia Pang
  *
  */
 
