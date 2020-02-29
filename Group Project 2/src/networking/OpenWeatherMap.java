@@ -47,6 +47,11 @@ public class OpenWeatherMap {
 	 * The currently saved weather values.
 	 */
 	private HashMap<WeatherType, Double> myCurrent;
+	
+	/**
+	 * The currently saved weather values.
+	 */
+	private HashMap<WeatherType, Double> current;
 
 	/**
 	 * The assumed minimum reasonable value for any given weather type.
@@ -62,7 +67,6 @@ public class OpenWeatherMap {
 	/**
 	 * Provides exponents to control the flow of the simulator.
 	 */
-	private Map<Window, Double> timeExponents;
 
 
 	public OpenWeatherMap() {		
@@ -71,12 +75,7 @@ public class OpenWeatherMap {
 		String description;		
 		try {
 			obj = fetch(location);
-			
-			timeExponents = new HashMap<>();
-			timeExponents.put(Window.hours, 0.85);
-			timeExponents.put(Window.days, 0.65);
-			timeExponents.put(Window.months, 0.38);	
-			
+						
 			// Initialize the base values for the updating weather types.
 			myBase = new HashMap<>();
 			myBase.put(WeatherType.temp, 60.);
@@ -122,20 +121,22 @@ public class OpenWeatherMap {
 			
 			// Initializes the base values for the ranges.
 			myRange = new HashMap<>();
-			myRange.put(WeatherType.temp, 20.);
-			myRange.put(WeatherType.outtemp, 90.);
-			myRange.put(WeatherType.humidity, 80.);
-			myRange.put(WeatherType.outhumidity, 50.);
-			myRange.put(WeatherType.rainRate, 0.6);
-			myRange.put(WeatherType.rain, 4.2);
-			myRange.put(WeatherType.windchill, 30.);
-			myRange.put(WeatherType.wind, 15.);
-			myRange.put(WeatherType.winddir, 360.);
-			myRange.put(WeatherType.barometric, 0.06);
+			myRange.put(WeatherType.temp, 2.);
+			myRange.put(WeatherType.outtemp, 9.);
+			myRange.put(WeatherType.humidity, 8.);
+			myRange.put(WeatherType.outhumidity, 5.);
+			myRange.put(WeatherType.rainRate, 00.6);
+			myRange.put(WeatherType.rain, 0.42);
+			myRange.put(WeatherType.windchill, 3.);
+			myRange.put(WeatherType.wind, 1.5);
+			myRange.put(WeatherType.winddir, 36.);
+			myRange.put(WeatherType.barometric, 0.006);
 			
 			
 			//generate the initial current values.
-			myCurrent = new HashMap<WeatherType, Double>();			
+			myCurrent = new HashMap<WeatherType, Double>();		
+			
+			current = new HashMap<WeatherType, Double>();	
 			/**
 			 * Simulate indoor temperature
 			 */
@@ -311,17 +312,17 @@ public class OpenWeatherMap {
 		return obj;
 	}
 	
-	/**
-	 * On a new day, reset specific values to reflect a reality where we measure
-	 * these values within the scope of that specific day, such as rain.
-	 */
-	public void newDay() {
-		myCurrent.put(WeatherType.rain, 0.0);
-	}
+//	/**
+//	 * On a new day, reset specific values to reflect a reality where we measure
+//	 * these values within the scope of that specific day, such as rain.
+//	 */
+//	public void newDay() {
+//		myCurrent.put(WeatherType.rain, 0.0);
+//	}
 	
 	public void updateCurrent() {
+		Double ran = Math.random();
 		for (WeatherType t : myCurrent.keySet()) {
-
 			// Make the new value, which is going to be 95% the current value, and 5% some
 			// random value in
 			// the same range.
@@ -330,8 +331,14 @@ public class OpenWeatherMap {
 				currentValue = myCurrent.get(t) + myCurrent.get(WeatherType.rainRate) * 1.0 / 1440.0;
 				// Our storage is built for the weather requests to be made every 2.5 seconds.
 			} else if (t == WeatherType.rainRate) {
-				currentValue = myBase.get(t) + Math.random() * myRange.get(t); // Rain speed follows less logical rules
-																				// then other measures.
+				if(ran > 0.5) {
+					currentValue = myCurrent.get(t) + ran * myRange.get(t); // Rain speed follows less logical rules
+					// then other measures.
+				} else {
+					currentValue = myCurrent.get(t) - ran * myRange.get(t); // Rain speed follows less logical rules
+					// then other measures.
+				}
+				
 			} else if (t == WeatherType.windchill) {
 				// Use commonly available wind chill formula if the temperature is below 50
 				// degrees.
@@ -348,10 +355,12 @@ public class OpenWeatherMap {
 				// Else assume percieved temperature is the current temperature.
 
 			} else {
-				currentValue = myCurrent.get(t)
-						+ (myBase.get(t) + Math.random() * myRange.get(t));
+				if(ran > 0.5) {
+					currentValue = myCurrent.get(t) + ran * myRange.get(t);
+				} else {
+					currentValue = myCurrent.get(t) - ran * myRange.get(t);
+				}
 			}
-
 			// Update the current value if the current value isn't related to rain.
 			// If the current value IS rain, update it if the current humidity is high
 			// enough for it to rain.
@@ -364,41 +373,5 @@ public class OpenWeatherMap {
 		HashMap<WeatherType, Double> toReturn = new HashMap<>();
 		toReturn.putAll(myCurrent);
 		return toReturn;
-	}
-	
-	public HashMap<WeatherType, Double[]> getInitialSets(Window theTimeWindow) throws IOException, JSONException{
-		HashMap<WeatherType, Double[]> initialSet = new HashMap<>();
-		// We have to generate new data for every key in the data set.
-		// So Keys*25 data elements.
-		for (WeatherType t : myCurrent.keySet()) {
-			Double[] initialData = new Double[25];
-			//Generate the new data set.
-			//There is no rain at the start of a new day.
-			if(t == WeatherType.rain && theTimeWindow == Window.hours) {
-				myCurrent.put(t, 0.0);
-				
-			}
-			
-					
-			initialData[0] = myCurrent.get(t);
-			// The oldest data is the "Current Data."
-			for (int i = 1; i < 25; i++) {
-				//Inform the new data with the previous data.
-				if (t != WeatherType.rain || theTimeWindow != Window.hours) myCurrent.put(t, myCurrent.get(t) * timeExponents.get(theTimeWindow)
-						+ (1 - timeExponents.get(theTimeWindow)) * (myBase.get(t) + Math.random() * myRange.get(t)));
-				else {
-					//If it is rain over the hours, let it accumulate.
-					myCurrent.put(t, myCurrent.get(t)+Math.random()*myRange.get(WeatherType.rain)/24);
-					//Assume it rains ~ 15% of the time.
-				}
-				//Otherwise generate the weather data as normal.
-				initialData[i] = myCurrent.get(t);
-				// Generate a hopefully logical sequence of data for a seasonless simulator
-				// planet.
-				// Each value will be informed by the previous value.
-			}
-			initialSet.put(t, initialData);
-		}
-		return initialSet;
 	}
 }

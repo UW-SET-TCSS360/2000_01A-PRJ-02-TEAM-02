@@ -6,8 +6,11 @@
 package networking;
 
 import java.util.HashMap;
+import java.util.Map;
+
 import storage.Storage;
 import storage.WeatherType;
+import storage.Window;
 
 /**A simulator of a network which regularly requests the data from the simulator, passes it to storage, 
  * and informs the window that the new data has arrived.
@@ -31,7 +34,7 @@ public class Network {
 	 * simulator is still able to produce new values.
 	 * @return True if the storage has been sent new data.
 	 */
-	public boolean checkSimulator() {
+	public boolean checkUpdate() {
 		myOWM.updateCurrent();
 		
 		return true;
@@ -42,11 +45,11 @@ public class Network {
 	/**
 	 * Retrieves the most up to date values and sends them to the storage system.
 	 */
-	public void sendToStorage() {
+	public void sendToStorage(Window theTimeWindow) {
 		HashMap<WeatherType, Double> aMap =  myOWM.getCurrent();
 		for (WeatherType t : aMap.keySet()) {
-			myStorage.add(t, null, aMap.get(t));
-		}
+			myStorage.add(t, theTimeWindow, aMap.get(t));
+		}		
 	}
 
 }
