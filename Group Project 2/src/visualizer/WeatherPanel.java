@@ -31,7 +31,7 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	/**
 	 * The numbers format used in an upperPanelWindow's UI.
 	 */
-	private DecimalFormat myFormat = new DecimalFormat("#0.000");
+	private DecimalFormat myFormat = new DecimalFormat("#0.0");
 	
 	/**
 	 * The specific types of weather information our interface is ready to display.
@@ -57,6 +57,7 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	
 	public WeatherPanel(Map<WeatherType, Double> theData) {
 		myData = new HashMap<>();
+		myDisplayElements = new HashMap<>();
 		myData.putAll(theData);
 		this.populatePanel();
 	}
@@ -75,7 +76,8 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 			WeatherType type = supportedTypes[i]; // Get the Datatype.
 			if (newData.containsKey(type)) { // See if it was included in the list of updated data.
 				myData.put(type, newData.get(type)); // Update our local copy of the data.
-				String toSet = getTypeString(i);
+				String toSet = myFormat.format(myData.get(type)) + type.getUnits();
+				if (type == WeatherType.winddir) toSet = "From " + getDirection(myData.get(WeatherType.winddir));
 				myDisplayElements.get(type).setText(toSet); // Update the text of our display elements.
 				// Only if we have new data.
 			}
@@ -113,8 +115,8 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	 * @return A string describing the direction the given angle points in.
 	 */
 	private String getDirection(Double theDegree) {
-		if (theDegree<0 || theDegree>360)
-			throw new IllegalArgumentException();
+		//if (theDegree<0 || theDegree>360)
+		//	throw new IllegalArgumentException();
 		String toReturn;
 		if (theDegree<30 && theDegree>=0 || theDegree>=330 && theDegree <=360) {
 			toReturn="North";
@@ -190,32 +192,35 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         this.add(lbloutside);
         
         //Indoor temp static text
-        JLabel insideTempLabel = new JLabel(Double.toString(myData.get(WeatherType.temp)) + "°F");
+        JLabel insideTempLabel = new JLabel(myFormat.format(myData.get(WeatherType.temp)) + "°F");
         insideTempLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        insideTempLabel.setForeground(Color.GREEN);
+        insideTempLabel.setForeground(Color.BLACK);
         insideTempLabel.setBounds(250, 20, 100, 35);
+        myDisplayElements.put(WeatherType.temp, insideTempLabel);
         this.add(insideTempLabel); 
         
         //Outside temp dynamic
-        JLabel outsideTempLabel = new JLabel(Double.toString(myData.get(WeatherType.outtemp)) + "°F");
-        outsideTempLabel.setForeground(Color.GREEN);
+        JLabel outsideTempLabel = new JLabel(myFormat.format(myData.get(WeatherType.outtemp)) + "°F");
+        outsideTempLabel.setForeground(Color.BLACK);
         outsideTempLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
         outsideTempLabel.setBounds(360, 20, 100, 35);
+        myDisplayElements.put(WeatherType.outtemp, outsideTempLabel);
         this.add(outsideTempLabel); 
         
         //INDOOR HUMIDITY static
-        JLabel humidityPercent = new JLabel("25%");
+        JLabel humidityPercent = new JLabel(myFormat.format(myData.get(WeatherType.humidity))+"%");
         humidityPercent.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        humidityPercent.setForeground(Color.GREEN);
+        humidityPercent.setForeground(Color.BLACK);
         humidityPercent.setBounds(480, 48, 46, 25);
         this.add(humidityPercent);
         
         //OUTDOOR HUMIDITY dynamic
-        JLabel label = new JLabel(myData.get(WeatherType.outhumidity) + "%");
-        label.setForeground(Color.GREEN);
-        label.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        label.setBounds(565, 50, 46, 25);
-        this.add(label);
+        JLabel outdoorHumidityPercent = new JLabel(myFormat.format(myData.get(WeatherType.outhumidity)) + "%");
+        outdoorHumidityPercent.setForeground(Color.BLACK);
+        outdoorHumidityPercent.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        outdoorHumidityPercent.setBounds(565, 50, 46, 25);
+        myDisplayElements.put(WeatherType.outhumidity, outdoorHumidityPercent);
+        this.add(outdoorHumidityPercent);
         
         //Pressure static label
         JLabel pressureLabel = new JLabel("PRESSURE");
@@ -224,10 +229,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         this.add(pressureLabel);
         
         //Pressure dynamic
-        JLabel barometricPressureLabel = new JLabel(myData.get(WeatherType.barometric) + " inHg");
+        JLabel barometricPressureLabel = new JLabel(myFormat.format(myData.get(WeatherType.barometric)) + " inHg");
         barometricPressureLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        barometricPressureLabel.setForeground(Color.GREEN);
+        barometricPressureLabel.setForeground(Color.BLACK);
         barometricPressureLabel.setBounds(335, 100, 125, 25);
+        myDisplayElements.put(WeatherType.barometric, barometricPressureLabel);
         this.add(barometricPressureLabel);
         
         //HUMIDITY static text
@@ -237,10 +243,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         this.add(humidityLabel);
         
         //HUMIDITY INSIDE dynamic
-        JLabel indoorHumidityLabel = new JLabel(myData.get(WeatherType.humidity) + "%");
+        JLabel indoorHumidityLabel = new JLabel(myFormat.format(myData.get(WeatherType.humidity)) + "%");
         indoorHumidityLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        indoorHumidityLabel.setForeground(Color.GREEN);
+        indoorHumidityLabel.setForeground(Color.BLACK);
         indoorHumidityLabel.setBounds(250, 155, 125, 25);
+        myDisplayElements.put(WeatherType.humidity, indoorHumidityLabel);
         this.add(indoorHumidityLabel);
         
         JLabel insideHum = new JLabel("---INSIDE---");
@@ -249,10 +256,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         insideHum.setBounds(250, 180, 100, 14);
         this.add(insideHum);
         
-        JLabel outdoorHumidityLabel = new JLabel(myData.get(WeatherType.outhumidity) + "%");
+        JLabel outdoorHumidityLabel = new JLabel(myFormat.format(myData.get(WeatherType.outhumidity)) + "%");
         outdoorHumidityLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        outdoorHumidityLabel.setForeground(Color.GREEN);
+        outdoorHumidityLabel.setForeground(Color.BLACK);
         outdoorHumidityLabel.setBounds(360, 155, 125, 25);
+        myDisplayElements.put(WeatherType.outhumidity, outdoorHumidityLabel);
         this.add(outdoorHumidityLabel);
         
         JLabel outsideHum = new JLabel("---OUTSIDE---");
@@ -263,10 +271,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         
         
         //Rainfall dynamic
-        JLabel rainfallLabel = new JLabel(myData.get(WeatherType.rain) + " in");
-        rainfallLabel.setForeground(Color.GREEN);
+        JLabel rainfallLabel = new JLabel(myFormat.format(myData.get(WeatherType.rain)) + " in");
+        rainfallLabel.setForeground(Color.BLACK);
         rainfallLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
         rainfallLabel.setBounds(520, 157, 76, 25);
+        myDisplayElements.put(WeatherType.rain, rainfallLabel);
         this.add(rainfallLabel);
         
         
@@ -289,16 +298,18 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         
         //dynamic text for rainfall
        // JLabel rainFall = new JLabel(myData
-        JLabel rainFallLabel = new JLabel(myData.get(WeatherType.rain) + " in");
-        rainFallLabel.setForeground(Color.GREEN);
+        JLabel rainFallLabel = new JLabel(myFormat.format(myData.get(WeatherType.rain)) + " in");
+        rainFallLabel.setForeground(Color.BLACK);
         rainFallLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
         rainFallLabel.setBounds(250, 185, 160, 120);
+        myDisplayElements.put(WeatherType.rain, rainFallLabel);
         this.add(rainFallLabel);
         
-        JLabel rainFallRateLabel = new JLabel(myData.get(WeatherType.rainRate) + " in");
-        rainFallRateLabel.setForeground(Color.GREEN);
+        JLabel rainFallRateLabel = new JLabel(myFormat.format(myData.get(WeatherType.rainRate)) + " in");
+        rainFallRateLabel.setForeground(Color.BLACK);
         rainFallRateLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
         rainFallRateLabel.setBounds(370, 185, 160, 120);
+        myDisplayElements.put(WeatherType.rainRate, rainFallRateLabel);
         this.add(rainFallRateLabel);
         
       //Static text for wind info below
@@ -309,17 +320,19 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         this.add(windTextLabel); 
         
         //Text displaying wind speed
-        JLabel windSpeedTextLabel = new JLabel(myData.get(WeatherType.wind) + " MPH");
-        windSpeedTextLabel.setForeground(Color.GREEN);
+        JLabel windSpeedTextLabel = new JLabel(myFormat.format(myData.get(WeatherType.wind)) + " MPH");
+        windSpeedTextLabel.setForeground(Color.BLACK);
         windSpeedTextLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
         windSpeedTextLabel.setBounds(50, 20, 160, 20);
+        myDisplayElements.put(WeatherType.wind, windSpeedTextLabel);
         this.add(windSpeedTextLabel); 
         
         //Text for Wind Direction
         JLabel windDirTextLabel = new JLabel("From " + getDirection(myData.get(WeatherType.winddir)));
-        windDirTextLabel.setForeground(Color.GREEN);
+        windDirTextLabel.setForeground(Color.BLACK);
         windDirTextLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
         windDirTextLabel.setBounds(50, 170, 160, 20);
+        myDisplayElements.put(WeatherType.winddir, windDirTextLabel);
         this.add(windDirTextLabel); 
         
         
@@ -331,10 +344,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         this.add(windChillText); 
         
         //wind chill dynamic
-        JLabel windChillLabel = new JLabel(myData.get(WeatherType.windchill) + "°F");
-        windChillLabel.setForeground(Color.GREEN);
+        JLabel windChillLabel = new JLabel(myFormat.format(myData.get(WeatherType.windchill)) + "°F");
+        windChillLabel.setForeground(Color.BLACK);
         windChillLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
         windChillLabel.setBounds(20, 230, 160, 20);
+        myDisplayElements.put(WeatherType.windchill, windChillLabel);
         this.add(windChillLabel); 
          
         //WIND IMAGE

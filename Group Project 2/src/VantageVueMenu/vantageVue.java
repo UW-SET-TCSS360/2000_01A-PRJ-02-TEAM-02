@@ -13,10 +13,21 @@ import javax.swing.JFrame;
 import java.awt.Toolkit;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+
 import javax.swing.ButtonGroup;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import javax.swing.JRadioButton;
+import javax.swing.Timer;
+
+import networking.OpenWeatherMap;
+import storage.WeatherType;
+import visualizer.AlertsPanel;
+import visualizer.WeatherDataItem;
+import visualizer.WeatherPanel;
+
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JPanel;
@@ -36,7 +47,7 @@ public class vantageVue {
 	 /** Radio button for weather center tab*/
 	private JRadioButton weatherButton;
 	 /** Radio button for moon phase tab*/
-	private JRadioButton moonPhaseButton;
+	private JRadioButton alertButton;
 	 /** Panel to act as the main console*/
 	private JPanel panel;
 	 /** Label for the weather center title*/
@@ -76,6 +87,23 @@ public class vantageVue {
 	 /** Graphs tab title*/
 	private JLabel labelGraph;
 	/**
+	 * The weather panel.
+	 */
+	private WeatherPanel myWeatherPanel;
+	/**
+	 * The alert panel.
+	 */
+	private AlertsPanel myAlertPanel;
+	/**
+	 * The alert panel.
+	 */
+	private OpenWeatherMap myWeatherMap;
+	/**
+	 * 
+	 */
+	private Timer myTimer;
+	
+	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
@@ -95,8 +123,25 @@ public class vantageVue {
 	 * Creating the application (Constructor).
 	 */
 	public vantageVue() {
+		OpenWeatherMap myWeatherMap = new OpenWeatherMap();
+		HashMap<WeatherType, Double> theInitialWeather = myWeatherMap.getCurrent(); 
+		myWeatherPanel = new WeatherPanel(theInitialWeather);
+		myAlertPanel = new AlertsPanel();
+		//myGraphPanel = new GraphPanel();
+		myTimer = new Timer(2500, new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				myWeatherMap.updateCurrent();
+				HashMap<WeatherType, Double> theNewWeather = myWeatherMap.getCurrent();
+				myWeatherPanel.updateData(theNewWeather);
+				myAlertPanel.updateData(theNewWeather);
+				//myGraphPanel.updateData(theNewWeather); 
+			} 
+		});
 		initialize();
-	
+		myTimer.start();
 	}
 
 	/**
@@ -140,11 +185,11 @@ public class vantageVue {
 		weatherButton.setBounds(530, 293, 150, 40);
 		jFrame.getContentPane().add(weatherButton);
 
-		moonPhaseButton = new JRadioButton("Moon Phase");
-		moonPhaseButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		moonPhaseButton.setBackground(Color.LIGHT_GRAY);
-		moonPhaseButton.setBounds(530, 188, 150, 40);
-		jFrame.getContentPane().add(moonPhaseButton);
+		alertButton = new JRadioButton("Alerts");
+		alertButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		alertButton.setBackground(Color.LIGHT_GRAY);
+		alertButton.setBounds(530, 188, 150, 40);
+		jFrame.getContentPane().add(alertButton);
 
 		/**Add action listeners to all of the buttons which will update their panels when clicked on */
 		graphsButton.addActionListener(new ActionListener() {
@@ -160,16 +205,16 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-			
+					panel.add(myWeatherPanel);
 				panel.repaint();
 			}
 		});
 
-		moonPhaseButton.addActionListener(new ActionListener() {
+		alertButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-			
+					panel.add(myAlertPanel);
 				panel.repaint();
 			}
 		});
@@ -191,7 +236,7 @@ public class vantageVue {
 		ButtonGroup G = new ButtonGroup();
 		G.add(graphsButton);
 		G.add(weatherButton);
-		G.add(moonPhaseButton);
+		G.add(alertButton);
 		G.add(homeButton);
 		
 		/** Display Options label placed above the buttons*/
@@ -217,8 +262,5 @@ public class vantageVue {
 		panel.add(labelWelcome);
 
 	
-		
-
-
 	}
 }

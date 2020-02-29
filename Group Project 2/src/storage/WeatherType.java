@@ -12,9 +12,9 @@ package storage;
  * @author Rory Fisher
  */
 public enum WeatherType {
-	temp("Indoor Tempature","*f"),
-	windchill("Wind Chill", ""),
-	outtemp("Outdoor Tempature", "*f"),
+	temp("Indoor Tempature","°F"),
+	windchill("Wind Chill", "°F"),
+	outtemp("Outdoor Tempature", "°F"),
 	humidity("Indoor Humiditiy",  "%"),
 	outhumidity("Outdoor Humidity",  "%"),
 	wind("Wind Speed", " mph"),
