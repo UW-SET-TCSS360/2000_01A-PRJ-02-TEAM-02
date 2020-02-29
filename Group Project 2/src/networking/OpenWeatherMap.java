@@ -122,8 +122,8 @@ public class OpenWeatherMap {
 			// Initializes the base values for the ranges.
 			myRange = new HashMap<>();
 			myRange.put(WeatherType.temp, 2.);
-			myRange.put(WeatherType.outtemp, 9.);
-			myRange.put(WeatherType.humidity, 8.);
+			myRange.put(WeatherType.outtemp, 4.);
+			myRange.put(WeatherType.humidity, 5.);
 			myRange.put(WeatherType.outhumidity, 5.);
 			myRange.put(WeatherType.rainRate, 00.6);
 			myRange.put(WeatherType.rain, 0.42);
