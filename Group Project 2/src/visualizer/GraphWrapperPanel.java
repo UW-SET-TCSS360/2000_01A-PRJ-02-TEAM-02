@@ -6,6 +6,7 @@
 package visualizer;
 
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -57,10 +58,11 @@ public class GraphWrapperPanel extends JTabbedPane implements WeatherDataItem{
 	public GraphWrapperPanel(Storage theStorage, HashMap<WeatherType, Double> startingData) {
 		// Will later accept inputs for whatever event generators and data systems we
 		// use in the project, but currently it has no inputs.
+		setBounds(0, 0, 483, 354);	
 		myCurrent = new HashMap<>();
 		myCurrent.putAll(startingData);
 		myStorage = theStorage;
-		//Initializes
+		//Initializes the graphics tabs.
 		addGraphicsTabs();
 		//Add a new timer that runs for one hour, loads the new data into the storage system, and 
 		myTimer = new Timer(3600000, new ActionListener() {
@@ -103,9 +105,7 @@ public class GraphWrapperPanel extends JTabbedPane implements WeatherDataItem{
 			toAdd = myStorage.getHistory(t, Window.months, true);
 			aInnerFrame.add(Window.months.toString(),
 					new GraphPanel(t.toString() + t.getUnits(), Window.months.toString() + " Ago", toAdd));
-
 		}
-
 	}
 
 	/**

@@ -133,8 +133,8 @@ public class vantageVue {
 		HashMap<WeatherType, Double> theInitialWeather = myWeatherMap.getCurrent(); 
 		myWeatherPanel = new WeatherPanel(theInitialWeather);
 		myAlertPanel = new AlertsPanel();
-		//Storage aStorage = myWeatherMap.getInitialSets();
-		//myGraphPanel = new GraphWrapperPanel(null, theInitialWeather);
+		Storage aStorage = new Storage();
+		myGraphPanel = new GraphWrapperPanel(aStorage, theInitialWeather);
 		myTimer = new Timer(2500, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -143,7 +143,7 @@ public class vantageVue {
 				HashMap<WeatherType, Double> theNewWeather = myWeatherMap.getCurrent();
 				myWeatherPanel.updateData(theNewWeather);
 				myAlertPanel.updateData(theNewWeather);
-				//myGraphPanel.updateData(theNewWeather); 
+				myGraphPanel.updateData(theNewWeather); 
 			} 
 		});
 		initialize();
@@ -202,7 +202,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-//					panel.add(myGraphPanel);
+				panel.add(myGraphPanel);
 				panel.repaint();
 			}
 		});
@@ -258,8 +258,6 @@ public class vantageVue {
 		panel.setBounds(22, 85, 483, 354);
 		jFrame.getContentPane().add(panel);
 		panel.setLayout(null);
-
-	
 
 		/** welcome label to be placed at home tab */
 		labelWelcome = new JLabel("Welcome to Davis's Vantage Vue");
