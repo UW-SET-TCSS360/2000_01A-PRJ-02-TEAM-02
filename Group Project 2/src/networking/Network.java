@@ -6,8 +6,6 @@
 package networking;
 
 import java.util.HashMap;
-import java.util.Map;
-
 import storage.Storage;
 import storage.WeatherType;
 import storage.Window;

@@ -312,14 +312,6 @@ public class OpenWeatherMap {
 		return obj;
 	}
 	
-//	/**
-//	 * On a new day, reset specific values to reflect a reality where we measure
-//	 * these values within the scope of that specific day, such as rain.
-//	 */
-//	public void newDay() {
-//		myCurrent.put(WeatherType.rain, 0.0);
-//	}
-	
 	public void updateCurrent() {
 		Double ran = Math.random();
 		for (WeatherType t : myCurrent.keySet()) {
