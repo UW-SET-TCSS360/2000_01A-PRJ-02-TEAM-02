@@ -49,11 +49,6 @@ public class OpenWeatherMap {
 	private HashMap<WeatherType, Double> myCurrent;
 	
 	/**
-	 * The currently saved weather values.
-	 */
-	private HashMap<WeatherType, Double> current;
-
-	/**
 	 * The assumed minimum reasonable value for any given weather type.
 	 */
 	private Map<WeatherType, Double> myBase;
@@ -139,7 +134,6 @@ public class OpenWeatherMap {
 			//generate the initial current values.
 			myCurrent = new HashMap<WeatherType, Double>();		
 			
-			current = new HashMap<WeatherType, Double>();	
 			/**
 			 * Simulate indoor temperature
 			 */
@@ -414,8 +408,8 @@ public class OpenWeatherMap {
 	}
 	
 	public void updateCurrent() {
-		Double ran = Math.random();
 		for (WeatherType t : myCurrent.keySet()) {
+			Double ran = Math.random();
 			// Make the new value, which is going to be 95% the current value, and 5% some
 			// random value in
 			// the same range.
@@ -425,10 +419,10 @@ public class OpenWeatherMap {
 				// Our storage is built for the weather requests to be made every 2.5 seconds.
 			} else if (t == WeatherType.rainRate) {
 				if(ran > 0.5) {
-					currentValue = myCurrent.get(t) + ran * myRange.get(t); // Rain speed follows less logical rules
+					currentValue = myCurrent.get(t) + Math.random() * myRange.get(t); // Rain speed follows less logical rules
 					// then other measures.
 				} else {
-					currentValue = myCurrent.get(t) - ran * myRange.get(t); // Rain speed follows less logical rules
+					currentValue = myCurrent.get(t) - Math.random() * myRange.get(t); // Rain speed follows less logical rules
 					// then other measures.
 				}
 				
@@ -448,11 +442,20 @@ public class OpenWeatherMap {
 				// Else assume percieved temperature is the current temperature.
 
 			} else {
-				if(ran > 0.5) {
-					currentValue = myCurrent.get(t) + ran * myRange.get(t);
+				if(myCurrent.get(t) < myBase.get(t) || (ran > 0.5 && myCurrent.get(t) < (myBase.get(t) + myRange.get(t)*20))) {
+					currentValue = myCurrent.get(t) + Math.random() * myRange.get(t);
 				} else {
-					currentValue = myCurrent.get(t) - ran * myRange.get(t);
+					currentValue = myCurrent.get(t) - Math.random() * myRange.get(t);
 				}
+			}
+			// Bounds Check.
+			if (t == WeatherType.winddir) {
+				if (currentValue > 360) currentValue = 200 + Math.random() * myRange.get(t);
+				if (currentValue < 0) currentValue = 100 - Math.random() * myRange.get(t);
+			}
+			if (t == WeatherType.humidity || t == WeatherType.outhumidity) {
+				if (currentValue > 100) currentValue = 100;
+				if (currentValue < 0) currentValue = 0;
 			}
 			// Update the current value if the current value isn't related to rain.
 			// If the current value IS rain, update it if the current humidity is high
@@ -481,10 +484,10 @@ public class OpenWeatherMap {
 			for (int i = 1; i < 25; i++) {
 				//Inform the new data with the previous data.
 				if (t != WeatherType.rain || theTimeWindow != Window.hours) myCurrent.put(t, myCurrent.get(t) * timeExponents.get(theTimeWindow)
-						+ (1 - timeExponents.get(theTimeWindow)) * (myBase.get(t) + Math.random() * myRange.get(t)));
+						+ (1 - timeExponents.get(theTimeWindow)) * (myBase.get(t) + Math.random() * 15 * myRange.get(t)));
 				else {
 					//If it is rain over the hours, let it accumulate.
-					myCurrent.put(t, myCurrent.get(t)+Math.random()*myRange.get(WeatherType.rain)/24);
+					myCurrent.put(t, myCurrent.get(t)+Math.random()*10*myRange.get(WeatherType.rain)/24);
 					//Assume it rains ~ 15% of the time.
 				}
 				//Otherwise generate the weather data as normal.

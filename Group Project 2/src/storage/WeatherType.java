@@ -21,7 +21,7 @@ public enum WeatherType {
 	winddir("Wind Direction", ""),
 	rainRate("Rainfall", " .in/Hr"),
 	rain("Rain", " .in"),
-	barometric("Pressure", " BAR");
+	barometric("Pressure", " p");
 
 	
 	/**

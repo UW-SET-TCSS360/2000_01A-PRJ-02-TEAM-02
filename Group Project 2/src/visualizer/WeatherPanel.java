@@ -124,8 +124,8 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	 * @return A string describing the direction the given angle points in.
 	 */
 	private String getDirection(Double theDegree) {
-		//if (theDegree<0 || theDegree>360)
-		//	throw new IllegalArgumentException();
+		if (theDegree<0 || theDegree>360)
+			throw new IllegalArgumentException();
 		String toReturn;
 		if (theDegree<30 && theDegree>=0 || theDegree>=330 && theDegree <=360) {
 			toReturn="North";
