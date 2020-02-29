@@ -54,6 +54,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	private String assetDirectory = "./src/visualizer/";
 	private String windDirectionFile = assetDirectory + "wind_north.png";
 
+	/**
+	 * The visual label of the wind direction.
+	 */
+	private JLabel windLabel;
+
 	
 	public WeatherPanel(Map<WeatherType, Double> theData) {
 		myData = new HashMap<>();
@@ -77,7 +82,11 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 			if (newData.containsKey(type)) { // See if it was included in the list of updated data.
 				myData.put(type, newData.get(type)); // Update our local copy of the data.
 				String toSet = myFormat.format(myData.get(type)) + type.getUnits();
-				if (type == WeatherType.winddir) toSet = "From " + getDirection(myData.get(WeatherType.winddir));
+				if (type == WeatherType.winddir) {
+					toSet = "From " + getDirection(myData.get(WeatherType.winddir));
+			        ImageIcon windImage = new ImageIcon(windDirectionFile);
+			        windLabel.setIcon(windImage);
+					}
 				myDisplayElements.get(type).setText(toSet); // Update the text of our display elements.
 				// Only if we have new data.
 			}
@@ -353,7 +362,7 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
          
         //WIND IMAGE
         ImageIcon windImage = new ImageIcon(windDirectionFile);
-        JLabel windLabel = new JLabel();
+        windLabel = new JLabel();
         windLabel.setLayout(null);
         windLabel.setSize(40, 40);
         windLabel.setBackground(Color.RED);

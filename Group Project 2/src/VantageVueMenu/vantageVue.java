@@ -23,8 +23,10 @@ import javax.swing.JRadioButton;
 import javax.swing.Timer;
 
 import networking.OpenWeatherMap;
+import storage.Storage;
 import storage.WeatherType;
 import visualizer.AlertsPanel;
+import visualizer.GraphWrapperPanel;
 import visualizer.WeatherDataItem;
 import visualizer.WeatherPanel;
 
@@ -99,7 +101,11 @@ public class vantageVue {
 	 */
 	private OpenWeatherMap myWeatherMap;
 	/**
-	 * 
+	 * A panel that wraps the graphing system, and updates the graphs on an hourly basis.
+	 */
+	private GraphWrapperPanel myGraphPanel;
+	/**
+	 * A timer that calls the weather map to update its data, and 
 	 */
 	private Timer myTimer;
 	
@@ -123,13 +129,13 @@ public class vantageVue {
 	 * Creating the application (Constructor).
 	 */
 	public vantageVue() {
-		OpenWeatherMap myWeatherMap = new OpenWeatherMap();
+		myWeatherMap = new OpenWeatherMap();
 		HashMap<WeatherType, Double> theInitialWeather = myWeatherMap.getCurrent(); 
 		myWeatherPanel = new WeatherPanel(theInitialWeather);
 		myAlertPanel = new AlertsPanel();
-		//myGraphPanel = new GraphPanel();
+		//Storage aStorage = myWeatherMap.getInitialSets();
+		//myGraphPanel = new GraphWrapperPanel(null, theInitialWeather);
 		myTimer = new Timer(2500, new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
@@ -196,7 +202,7 @@ public class vantageVue {
 			public void actionPerformed(ActionEvent e) {
 				panel.removeAll();
 				panel.updateUI();
-			
+//					panel.add(myGraphPanel);
 				panel.repaint();
 			}
 		});

@@ -1,7 +1,7 @@
 package storage;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Stores weather info up to 25 months, with incremental measurements of the first 25 days, and 25 hours.
@@ -123,7 +123,7 @@ public class Storage {
 	 * @param high Boolean flag- period high = true, period low = false
 	 * @return The specified record of measures, or null if not found.
 	 */
-	public List<Double> getHistory(WeatherType type, Window window, boolean high) {
+	public LinkedList<Double> getHistory(WeatherType type, Window window, boolean high) {
 		
 		return weather.get(type).getLog(window, high);
 		
