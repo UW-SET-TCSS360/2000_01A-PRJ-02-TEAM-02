@@ -1,3 +1,7 @@
+/*
+ * TCSS 360 Project 2, Group 2
+ */
+
 package visualizer;
 
 import java.awt.Color;
@@ -14,6 +18,12 @@ import javax.swing.JPanel;
 
 import storage.WeatherType;
 
+/**
+ * A panel for displaying current weather data. 
+ * 
+ * @author David Solomon
+ *
+ */
 public class WeatherPanel extends JPanel implements WeatherDataItem {
 
 	private static final long serialVersionUID = 1L;
@@ -43,18 +53,20 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	
 	private String assetDirectory = "./src/visualizer/";
 	private String windDirectionFile = assetDirectory + "wind_north.png";
-	
-	
-	/***********************************************/
+
 	
 	public WeatherPanel(Map<WeatherType, Double> theData) {
 		myData = new HashMap<>();
 		myData.putAll(theData);
 		this.populatePanel();
-		//setupDisplayBits();
 	}
 
-	
+
+	/**
+	 * Update weather with the given Map of weather types and corresponding data.
+	 * 
+	 * @param newData is new weather data to replace current data.
+	 */
 	@Override
 	public void updateData(Map<WeatherType, Double> newData) {
 		myData.put(WeatherType.windchill, newData.get(WeatherType.windchill));
@@ -95,7 +107,7 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 		return toReturn;
 	}
 	
-	 /* Takes an angle that is in degrees, and returns a direction starting from straight north, and rotating degrees clockwise.
+	 /** Takes an angle that is in degrees, and returns a direction starting from straight north, and rotating degrees clockwise.
 	 * AKA, the "Degrees from north" method.
 	 * @param theDegree A double representing a value that is between from 0 to 360.
 	 * @return A string describing the direction the given angle points in.
@@ -132,8 +144,10 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 		return toReturn;
 	}
 	
-
-	
+	/**
+	 * 
+	 * @return the current weather types and their values. 
+	 */
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		Set<WeatherType> weatherSet = myData.keySet();
@@ -144,7 +158,9 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
 	}
 	
 
-	
+	/**
+	 * Add the various Jlabels and textfields to this panel. 
+	 */
 	private void populatePanel() {
     	this.setForeground(SystemColor.textHighlight);
         //this.setBorder(new LineBorder(Color.BLACK, 4, true));
@@ -253,7 +269,6 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         rainfallLabel.setBounds(520, 157, 76, 25);
         this.add(rainfallLabel);
         
-      
         
         //static text for rain info
         JLabel rainTextLabel = new JLabel("RAINFALL");
@@ -333,28 +348,5 @@ public class WeatherPanel extends JPanel implements WeatherDataItem {
         windLabel.setIcon(windImage);
         windLabel.setVisible(true);
         this.add(windLabel);
-        
-        /*
-        //Forecast dynamic text
-        JLabel tempOutLabel = new JLabel(forecast.toString().toUpperCase());
-        tempOutLabel.setForeground(Color.GREEN);
-        tempOutLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        tempOutLabel.setBounds(520, 193, 250, 35);
-        this.add(tempOutLabel); 
-        
-       
-        //24hr temp change static text
-        JLabel changelabel = new JLabel("24hr CHANGE:");
-        changelabel.setForeground(Color.GREEN);
-        changelabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
-        changelabel.setBounds(520, 250, 157, 35);
-        this.add(changelabel);
-        
-        //24hr temp change dynamic text
-        JLabel changeInWeatherLabel = new JLabel(Double.toString(this.temperature - this.yesterdayTemp) + "°F");
-        changeInWeatherLabel.setForeground(Color.GREEN);
-        changeInWeatherLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
-        changeInWeatherLabel.setBounds(520, 274, 124, 35);
-        this.add(changeInWeatherLabel); */
 	}	
 }
