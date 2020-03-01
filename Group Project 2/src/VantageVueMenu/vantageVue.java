@@ -59,7 +59,7 @@ public class vantageVue {
 	 /** date label*/
 	private JLabel dateLabel;
 	 /** Davis logo label*/
-	private JLabel DavisLogo;
+	private JLabel UWLogo;
 	 /** Welcome label for home tab*/
 	private JLabel labelWelcome;
 	 /** Label for the moon phase image*/
@@ -166,13 +166,13 @@ public class vantageVue {
 		jFrame.setResizable(false);
 		jFrame.getContentPane().setBackground(Color.GRAY);
 		jFrame.getContentPane().setLayout(null);
-		DavisLogo = new JLabel("New label");
-		DavisLogo.setBackground(Color.WHITE);
-		DavisLogo.setIcon(new ImageIcon(getClass().getResource("/Davis.PNG")));
-		DavisLogo.setBounds(22, 26, 238, 49);
-		jFrame.getContentPane().add(DavisLogo);
-		jFrame.setTitle("VantageVue Console");
-		jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Davis company logo.PNG")));
+		UWLogo = new JLabel();
+		UWLogo.setBackground(Color.WHITE);
+		UWLogo.setIcon(new ImageIcon(getClass().getResource("/UW.PNG")));
+		UWLogo.setBounds(22, 6, 238, 69);
+		jFrame.getContentPane().add(UWLogo);
+		jFrame.setTitle("UWantage UWue Console");
+		jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/UW.PNG")));
 		jFrame.setBounds(500, 150, 700, 482);
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -195,13 +195,13 @@ public class vantageVue {
 		weatherButton = new JRadioButton("Weather Center");
 		weatherButton.setBackground(Color.LIGHT_GRAY);
 		weatherButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		weatherButton.setBounds(530, 293, 150, 40);
+		weatherButton.setBounds(530, 188, 150, 40);
 		jFrame.getContentPane().add(weatherButton);
 
 		alertButton = new JRadioButton("Alerts");
 		alertButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		alertButton.setBackground(Color.LIGHT_GRAY);
-		alertButton.setBounds(530, 188, 150, 40);
+		alertButton.setBounds(530, 293, 150, 40);
 		jFrame.getContentPane().add(alertButton);
 
 		/**Add action listeners to all of the buttons which will update their panels when clicked on */
@@ -267,7 +267,7 @@ public class vantageVue {
 		panel.setLayout(null);
 
 		/** welcome label to be placed at home tab */
-		labelWelcome = new JLabel("Welcome to Davis's Vantage Vue");
+		labelWelcome = new JLabel("Welcome to UW's UWantage UWue");
 		labelWelcome.setBounds(10, 28, 399, 53);
 		labelWelcome.setFont(new Font("Tahoma", Font.PLAIN, 23));
 		panel.add(labelWelcome);
