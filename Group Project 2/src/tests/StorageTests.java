@@ -1,4 +1,4 @@
-package storage;
+package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,6 +8,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import storage.LinkedLog;
+import storage.Storage;
+import storage.WeatherType;
+import storage.Window;
 
 public class StorageTests {
 
